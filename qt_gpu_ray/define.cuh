@@ -5,6 +5,7 @@
 #include "device_launch_parameters.h"
 
 #define DIM 32
+#define DEFAULT_VECTOR_SIZE 10
 
 __device__ const int DEFAULT_SAMPLES = 16;
 __device__ const int DEFAULT_SETS = 53;

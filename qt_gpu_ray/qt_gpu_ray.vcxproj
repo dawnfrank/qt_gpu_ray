@@ -166,6 +166,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="mainwindow.h" />
     <ClInclude Include="mymath.cuh" />
     <ClInclude Include="rgbcolor.cuh" />
+    <ClInclude Include="vector.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

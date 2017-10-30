@@ -21,7 +21,7 @@ MainWindow::MainWindow() {
 
 	timer = new QTimer(ui.widget);
 	connect(timer, &QTimer::timeout, this, &MainWindow::render_scene);
-	timer->start(10);
+	timer->start(20);
 
 	host_bitmap = new unsigned char[w*h * 4];
 	InitCuda(w, h, &dev_bitmap);
