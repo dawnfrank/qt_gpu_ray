@@ -5,7 +5,8 @@
 #include <stdio.h>
 
 #include "define.cuh"
-#include "drand48.cuh"
+#include "Sphere.cuh"
+#include "shaderec.cuh"
 
 extern "C" cudaError_t InitCuda(const int w, const int h, unsigned char **dev_bitmap);
 extern "C" cudaError_t CalculateCuda(const int w, const int h, unsigned char *dev_bitmap,unsigned char *host_bitmap);
@@ -17,10 +18,22 @@ __global__ void Raykernel(const int w, const int h, unsigned char *dev_bitmap)
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	if (x < w && y < h) {
 		int offset = x + y * w;
-		dev_bitmap[offset * 4] = 255;
-		dev_bitmap[offset * 4 + 1] = 0;
-		dev_bitmap[offset * 4 + 2] = 0;
-		dev_bitmap[offset * 4 + 3] = 255;
+		Sphere sp(Vec3(0,0,0),60);
+		Ray r(Vec3(x, y, 100), Vec3(0, 0, -1));
+//		ShaderRec sr;
+		double tmin = 0.0001;
+		if (1) {
+			dev_bitmap[offset * 4] = 0;
+			dev_bitmap[offset * 4 + 1] = 0;
+			dev_bitmap[offset * 4 + 2] = 255;
+			dev_bitmap[offset * 4 + 3] = 255;
+		}
+		else {
+			dev_bitmap[offset * 4] = 0;
+			dev_bitmap[offset * 4 + 1] = 0;
+			dev_bitmap[offset * 4 + 2] = 0;
+			dev_bitmap[offset * 4 + 3] = 255;
+		}
 	}
 }
 
