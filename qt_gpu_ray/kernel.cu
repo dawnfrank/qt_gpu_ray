@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "define.cuh"
+#include "drand48.cuh"
 
 extern "C" cudaError_t InitCuda(const int w, const int h, unsigned char **dev_bitmap);
 extern "C" cudaError_t CalculateCuda(const int w, const int h, unsigned char *dev_bitmap,unsigned char *host_bitmap);
