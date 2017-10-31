@@ -89,6 +89,9 @@
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
 copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
+    <CudaCompile>
+      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -168,6 +171,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="mainwindow.h" />
     <ClInclude Include="mymath.cuh" />
     <ClInclude Include="objectbase.cuh" />
+    <ClInclude Include="plane.cuh" />
     <ClInclude Include="ray.cuh" />
     <ClInclude Include="rgbcolor.cuh" />
     <ClInclude Include="sampler.cuh" />

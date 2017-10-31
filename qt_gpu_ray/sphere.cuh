@@ -15,7 +15,6 @@ public:
 		double c = oc*oc - radius*radius;
 		double discriminant = b*b - a*c;
 
-
 		if (discriminant > 0) {
 			double temp = (-b - sqrt(discriminant)) / a;
 			if (temp > kEpsilon) {

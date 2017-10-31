@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sphere.cuh"
 #include "viewplane.cuh"
 #include "objectbase.cuh"
 #include "camera.cuh"
@@ -27,6 +28,7 @@ public:
 		return sr;
 	}
 
+	Sphere* sp_ptr;
 	RGBColor bg_color;
 	ViewPlane vp;
 	Camera* camera_ptr;
