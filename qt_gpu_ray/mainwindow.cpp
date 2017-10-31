@@ -9,8 +9,7 @@
 
 #include "stdio.h"
 
-extern "C" cudaError_t InitCuda(const int w, const int h, unsigned char **dev_bitmap);
-extern "C" cudaError_t CalculateCuda(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap);
+extern "C" void CalculateCuda(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap);
 
 
 MainWindow::MainWindow() {
@@ -23,8 +22,9 @@ MainWindow::MainWindow() {
 	connect(timer, &QTimer::timeout, this, &MainWindow::render_scene);
 	timer->start(20);
 
-	host_bitmap = new unsigned char[w*h * 4];
-	InitCuda(w, h, &dev_bitmap);
+	const int imageSize = w*h * 4;
+	host_bitmap = new unsigned char[imageSize];
+	cudaMalloc(&dev_bitmap, imageSize);
 }
 
 void MainWindow::render_scene()

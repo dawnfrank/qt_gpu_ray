@@ -4,58 +4,103 @@
 
 #include <stdio.h>
 
-#include "define.cuh"
 #include "Sphere.cuh"
-#include "shaderec.cuh"
+#include "world.cuh"
+#include "camera_pinhole.cuh"
+#include "sample_multijitered.cuh"
 
-extern "C" cudaError_t InitCuda(const int w, const int h, unsigned char **dev_bitmap);
-extern "C" cudaError_t CalculateCuda(const int w, const int h, unsigned char *dev_bitmap,unsigned char *host_bitmap);
+extern "C" void CalculateCuda(const int w, const int h, unsigned char *dev_bitmap,unsigned char *host_bitmap);
 
 
-__global__ void Raykernel(const int w, const int h, unsigned char *dev_bitmap)
+__global__ void Raykernel(const int w, const int h, unsigned char *dev_bitmap,World* dev_world)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	if (x < w && y < h) {
 		int offset = x + y * w;
-		Sphere sp(Vec3(0,0,0),60);
-		Ray r(Vec3(x, y, 100), Vec3(0, 0, -1));
-//		ShaderRec sr;
-		double tmin = 0.0001;
-		if (1) {
-			dev_bitmap[offset * 4] = 0;
-			dev_bitmap[offset * 4 + 1] = 0;
-			dev_bitmap[offset * 4 + 2] = 255;
-			dev_bitmap[offset * 4 + 3] = 255;
+
+		RGBColor pixel_color;
+		ShaderRec sr;
+		Ray ray;
+		Vec2 sp, pp;
+		
+		double distanceZ = (dev_world->camera_ptr->eye - dev_world->camera_ptr->at).magnitude();
+		double pixel_size = dev_world->vp.pixel_size;
+		int sample_num = dev_world->vp.get_samples_num();
+		ray.origin = dev_world->camera_ptr->eye;
+
+		for (int s = 0; s != sample_num; ++s) {
+			sp = dev_world->vp.sampler_ptr->sample_unit_square();
+			pp.x = pixel_size*(x - 0.5*(w - 1) + sp.x);
+			pp.y = pixel_size*(y - 0.5*(h - 1) + sp.y);
+			ray.direction = Vec3(pp.x, pp.y, distanceZ);
+			sr = dev_world->hit_objects(ray);
+			if (sr.hit_an_object) pixel_color+=sr.color;
+			else pixel_color+=dev_world->bg_color;
 		}
-		else {
-			dev_bitmap[offset * 4] = 0;
-			dev_bitmap[offset * 4 + 1] = 0;
-			dev_bitmap[offset * 4 + 2] = 0;
-			dev_bitmap[offset * 4 + 3] = 255;
-		}
+		pixel_color /= sample_num;
+
+		dev_bitmap[offset * 4] = int(pixel_color[2] * 255.99);
+		dev_bitmap[offset * 4 + 1] = int(pixel_color[1] * 255.99);
+		dev_bitmap[offset * 4 + 2] = int(pixel_color[0]*255.99);
+		dev_bitmap[offset * 4 + 3] = 255;
 	}
 }
 
+__global__ void worldKernel(const int w, const int h, World* dev_world) {
+	dev_world->bg_color = RGBColor(0, 0, 0);
+
+	dev_world->vp.hres = w;
+	dev_world->vp.vres = h;
+	dev_world->vp.pixel_size = 1;
+	dev_world->vp.gamma = 1.0;
+	dev_world->vp.inv_gamma = 1.0;
+	dev_world->vp.set_sampler(new Sample_MultiJittered());
+
+	dev_world->camera_ptr = new Camera_Pinhole(Vec3(0, 0, 100), Vec3(0, 0, 0));
+
+	Sphere *sphere_ptr = new Sphere(Vec3(0, 0, 0), 80);
+	sphere_ptr->color = RGBColor(1, 0, 0);
+	dev_world->add_object(sphere_ptr);
+
+	/*
+	sphere_ptr = new Sphere(Vec3(0, -25, 0), 60);
+	sphere_ptr->color = RGBColor(0, 1, 0);
+	add_object(sphere_ptr);
+
+	Plane *plane_ptr = new Plane(Vec3(0, 0, 0), Vec3(0, 0, 1));
+	plane_ptr->color = RGBColor(0.8, 0.8, 0.8);
+	add_object(plane_ptr);
+	*/
+}
+
+__global__ void showKernel(World* dev_world) {
+	printf("showKernel = %d", dev_world->vp.hres);
+}
+
+// Helper function for using CUDA to add vectors in parallel.
+void CalculateCuda(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap)
+{
+	World* dev_world = nullptr;
+	cudaMalloc(&dev_world,sizeof(World));
+	worldKernel << <1, 1 >> > (w, h, dev_world);
+
+	const int imageSize = w*h * 4;
+	dim3 blocks((w + DIM - 1) / DIM, (h + DIM - 1) / DIM);
+	dim3 threads(DIM, DIM);
+	// Launch a kernel on the GPU with one thread for each element.
+	Raykernel << <blocks, threads >> > (w, h, dev_bitmap, (World *)dev_world);
+
+	cudaMemcpy(host_bitmap, dev_bitmap, imageSize, cudaMemcpyDeviceToHost);
+	cudaFree(dev_world);
+}
+
+
+/*
 cudaError_t InitCuda(const int w, const int h, unsigned char **dev_bitmap)
 {
 	const int imageSize = w*h * 4;
 	cudaError_t cudaStatus = cudaMalloc(dev_bitmap, imageSize * sizeof(int));
 	return cudaStatus;
 }
-
-// Helper function for using CUDA to add vectors in parallel.
-cudaError_t CalculateCuda(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap)
-{
-	const int imageSize = w*h * 4;
-	dim3 blocks((w + DIM - 1) / DIM, (h + DIM - 1) / DIM);
-	dim3 threads(DIM, DIM);
-	// Launch a kernel on the GPU with one thread for each element.
-	Raykernel << <blocks, threads >> > (w, h, dev_bitmap);
-
-	cudaError_t cudaStatus = cudaMemcpy(host_bitmap, dev_bitmap, imageSize, cudaMemcpyDeviceToHost);
-	if (cudaStatus != cudaSuccess) {
-		fprintf(stderr, "cudaDeviceReset failed!");
-	}
-	return cudaStatus;
-}
+*/
