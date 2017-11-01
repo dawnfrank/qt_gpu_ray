@@ -6,6 +6,7 @@
 
 class QLabel;
 class QTimer;
+class World;
 
 class MainWindow :public QWidget {
 public:
@@ -17,8 +18,10 @@ private:
 	FPS fps;
 	QLabel *label;
 	QTimer *timer;
+
 	const int w = 800;
 	const int h = 600;
 	unsigned char *host_bitmap;
 	unsigned char *dev_bitmap;
+	World* dev_world;
 };

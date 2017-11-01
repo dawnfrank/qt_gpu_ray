@@ -9,7 +9,8 @@
 
 #include "stdio.h"
 
-extern "C" void CalculateCuda(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap);
+extern "C" World* InitWorld(const int w, const int h);
+extern "C" void RenderWorld(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap, World* dev_world);
 
 
 MainWindow::MainWindow() {
@@ -25,13 +26,14 @@ MainWindow::MainWindow() {
 	const int imageSize = w*h * 4;
 	host_bitmap = new unsigned char[imageSize];
 	cudaMalloc(&dev_bitmap, imageSize);
+
+	dev_world = InitWorld(w, h);
 }
 
 void MainWindow::render_scene()
 {
 	fps.Update();
-	CalculateCuda(w, h, dev_bitmap, host_bitmap);
+	RenderWorld(w, h, dev_bitmap, host_bitmap, dev_world);
 	QImage image(host_bitmap, w, h, QImage::Format_ARGB32);
-	image = image.mirrored(false, true);
 	label->setPixmap(QPixmap::fromImage(image));
 }
