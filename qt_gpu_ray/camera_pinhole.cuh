@@ -7,7 +7,6 @@ public:
 	__device__ Camera_Pinhole(Vec3 eye, Vec3 at, Vec3 up = Vec3(0, 1, 0))
 		:Camera(eye, at, up)
 	{
-		zoom = 0.5;
 		d = at[2] - eye[2];
 		angle = 0;
 	}
@@ -18,5 +17,4 @@ public:
 	}
 
 	double d;
-	double zoom;
 };

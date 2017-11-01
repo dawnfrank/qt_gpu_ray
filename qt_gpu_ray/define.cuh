@@ -7,7 +7,7 @@
 #define DIM 32
 #define DEFAULT_VECTOR_SIZE 10
 
-__device__ const int DEFAULT_SAMPLES = 16;
+__device__ const int DEFAULT_SAMPLES = 4;
 __device__ const int DEFAULT_SETS = 53;
 
 __device__ const double 	TWO_PI = 6.2831853071795864769;

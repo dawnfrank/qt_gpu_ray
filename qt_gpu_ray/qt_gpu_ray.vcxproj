@@ -166,6 +166,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="camera.cuh" />
     <ClInclude Include="camera_pinhole.cuh" />
     <ClInclude Include="define.cuh" />
+    <ClInclude Include="define.h" />
     <ClInclude Include="drand48.cuh" />
     <ClInclude Include="fps.h" />
     <ClInclude Include="mainwindow.h" />
@@ -176,6 +177,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="rgbcolor.cuh" />
     <ClInclude Include="sampler.cuh" />
     <ClInclude Include="sample_multijitered.cuh" />
+    <ClInclude Include="scenedata.h" />
     <ClInclude Include="shaderec.cuh" />
     <ClInclude Include="sphere.cuh" />
     <ClInclude Include="vector.cuh" />

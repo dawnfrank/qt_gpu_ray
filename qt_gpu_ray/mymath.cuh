@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math.h>
+#include "math_functions.h"
 #include "device_launch_parameters.h"
 
 #define EPSILON 1e-6f
@@ -166,6 +166,13 @@ struct Mat3 {
 		mat[0] = v1[0]; mat[3] = v1[1]; mat[6] = v1[2];
 		mat[1] = v2[0]; mat[4] = v2[1]; mat[7] = v2[2];
 		mat[2] = v3[0]; mat[5] = v3[1]; mat[8] = v3[2];
+	}
+	__device__ Vec3 operator*(const Vec3 &v) const {
+		Vec3 ret;
+		ret[0] = mat[0] * v[0] + mat[3] * v[1] + mat[6] * v[2];
+		ret[1] = mat[1] * v[0] + mat[4] * v[1] + mat[7] * v[2];
+		ret[2] = mat[2] * v[0] + mat[5] * v[1] + mat[8] * v[2];
+		return ret;
 	}
 	__device__ Mat3 operator*(double f) const {
 		Mat3 ret;

@@ -3,6 +3,8 @@
 #include "device_launch_parameters.h"
 
 #include <stdio.h>
+#include "scenedata.h"
+#include "define.h"
 
 #include "sphere.cuh"
 #include "plane.cuh"
@@ -11,6 +13,7 @@
 #include "sample_multijitered.cuh"
 
 extern "C" World* InitWorld(const int w, const int h);
+extern "C" void ModifyWorld(SceneData sData, World* dev_world);
 extern "C" void RenderWorld(const int w, const int h, unsigned char *dev_bitmap, unsigned char *host_bitmap, World* dev_world);
 
 
@@ -42,7 +45,6 @@ __global__ void Raykernel(const int w, const int h, unsigned char *dev_bitmap, W
 			else pixel_color += dev_world->bg_color;
 		}
 		pixel_color /= sample_num;
-		
 
 		dev_bitmap[offset * 4] = int(pixel_color[2] * 255.99);
 		dev_bitmap[offset * 4 + 1] = int(pixel_color[1] * 255.99);
@@ -91,4 +93,27 @@ World* InitWorld(const int w, const int h) {
 	worldKernel << <1, 1 >> > (w, h, dev_world);
 
 	return dev_world;
+}
+
+__global__ void modifyKernel(int cameraCmd, int cameraRotateX, int cameraRotateY, int cameraZoom, World* dev_world) {
+	Vec3 moveDir;
+	if (cameraCmd & CAMERA_CMD_W) moveDir.z -= CAMERA_MOVE_DIS;
+	if (cameraCmd & CAMERA_CMD_S) moveDir.z += CAMERA_MOVE_DIS;
+	if (cameraCmd & CAMERA_CMD_A) moveDir.x -= CAMERA_MOVE_DIS;
+	if (cameraCmd & CAMERA_CMD_D) moveDir.x += CAMERA_MOVE_DIS;
+	if (moveDir.x != 0 || moveDir.y != 0 || moveDir.z != 0) dev_world->camera_ptr->move(moveDir);
+
+	if (cameraRotateX != 0 || cameraRotateY != 0) dev_world->camera_ptr->rotate(Vec3(cameraRotateX, cameraRotateY, 0));
+
+	if (cameraZoom != 0)dev_world->camera_ptr->zoom(cameraZoom);
+
+}
+
+void ModifyWorld(SceneData sData, World* dev_world)
+{
+	int cameraCmd = sData.cameraCmd;
+	int cameraRotateX = sData.cameraRotateX;
+	int cameraRotateY = sData.cameraRotateY;
+	int cameraZoom = sData.cameraZoom;
+	modifyKernel << <1, 1 >> > (cameraCmd, cameraRotateX, cameraRotateY, cameraZoom, dev_world);
 }
