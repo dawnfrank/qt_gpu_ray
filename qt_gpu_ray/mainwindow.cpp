@@ -32,5 +32,6 @@ void MainWindow::render_scene()
 	fps.Update();
 	CalculateCuda(w, h, dev_bitmap, host_bitmap);
 	QImage image(host_bitmap, w, h, QImage::Format_ARGB32);
+	image = image.mirrored(false, true);
 	label->setPixmap(QPixmap::fromImage(image));
 }
