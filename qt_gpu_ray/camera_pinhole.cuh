@@ -12,7 +12,7 @@ public:
 		angle = 0;
 	}
 	__device__ Vec3 ray_direction(const Vec2 p) const {
-		Vec3 dir = p.x*u + p.y*v - d*w;
+		Vec3 dir = p.x*coord.x + p.y*coord.y - d*coord.z;
 		dir.normalize();
 		return dir;
 	}

@@ -79,10 +79,6 @@ __global__ void worldKernel(const int w, const int h, World* dev_world) {
 	sphere_ptr->color = RGBColor(1, 0, 0);
 	dev_world->add_object(sphere_ptr);
 
-	//	Sphere *sphere_ptr = new Sphere(Vec3(0, -20, 0), 60);
-	//	sphere_ptr->color = RGBColor(0, 1, 0);
-	//	dev_world->add_object(sphere_ptr);
-
 	Plane *plane_ptr = new Plane(Vec3(0, 0, 0), Vec3(0, 1, 0));
 	plane_ptr->color = RGBColor(0.8, 0.8, 0.8);
 	dev_world->add_object(plane_ptr);
@@ -94,6 +90,5 @@ World* InitWorld(const int w, const int h) {
 	cudaMalloc(&dev_world, sizeof(World));
 	worldKernel << <1, 1 >> > (w, h, dev_world);
 
-	printf("123");
 	return dev_world;
 }
