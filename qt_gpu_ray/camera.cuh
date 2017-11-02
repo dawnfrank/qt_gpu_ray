@@ -48,7 +48,6 @@ public:
 		movePos.z = z*coord.z.z;
 
 		eye += movePos;
-
 	}
 
 	Vec3 eye, at, up;

@@ -148,14 +148,14 @@ __device__ inline Vec3 operator/(double t, const Vec3 &v) { return v / t; }
 
 struct Mat3 {
 	__device__ Mat3() {
-		mat[0] = 1.0; mat[3] = 0.0; mat[6] = 0.0;
-		mat[1] = 0.0; mat[4] = 1.0; mat[7] = 0.0;
-		mat[2] = 0.0; mat[5] = 0.0; mat[8] = 1.0;
+		mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
+		mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
+		mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 	}
 	__device__ Mat3(const double *m) {
-		mat[0] = m[0]; mat[3] = m[3]; mat[6] = m[6];
-		mat[1] = m[1]; mat[4] = m[4]; mat[7] = m[7];
-		mat[2] = m[2]; mat[5] = m[5]; mat[8] = m[8];
+		mat[0] = m[0]; mat[1] = m[1]; mat[2] = m[2];
+		mat[3] = m[3]; mat[4] = m[4]; mat[5] = m[5];
+		mat[6] = m[6]; mat[7] = m[7]; mat[8] = m[8];
 	}
 	__device__ Mat3(const Mat3 &m) {
 		mat[0] = m[0]; mat[3] = m[3]; mat[6] = m[6];
@@ -169,18 +169,19 @@ struct Mat3 {
 	}
 	__device__ Vec3 operator*(const Vec3 &v) const {
 		Vec3 ret;
-		ret[0] = mat[0] * v[0] + mat[3] * v[1] + mat[6] * v[2];
-		ret[1] = mat[1] * v[0] + mat[4] * v[1] + mat[7] * v[2];
-		ret[2] = mat[2] * v[0] + mat[5] * v[1] + mat[8] * v[2];
+		ret[0] = mat[0] * v[0] + mat[1] * v[1] + mat[2] * v[2];
+		ret[1] = mat[3] * v[0] + mat[4] * v[1] + mat[5] * v[2];
+		ret[2] = mat[6] * v[0] + mat[7] * v[1] + mat[8] * v[2];
 		return ret;
 	}
 	__device__ Mat3 operator*(double f) const {
 		Mat3 ret;
-		ret[0] = mat[0] * f; ret[3] = mat[3] * f; ret[6] = mat[6] * f;
-		ret[1] = mat[1] * f; ret[4] = mat[4] * f; ret[7] = mat[7] * f;
-		ret[2] = mat[2] * f; ret[5] = mat[5] * f; ret[8] = mat[8] * f;
+		ret[0] = mat[0] * f; ret[1] = mat[1] * f; ret[2] = mat[2] * f;
+		ret[3] = mat[3] * f; ret[4] = mat[4] * f; ret[5] = mat[5] * f;
+		ret[6] = mat[6] * f; ret[7] = mat[7] * f; ret[8] = mat[8] * f;
 		return ret;
 	}
+	/*
 	__device__ Mat3 operator*(const Mat3 &m) const {
 		Mat3 ret;
 		ret[0] = mat[0] * m[0] + mat[3] * m[1] + mat[6] * m[2];
@@ -193,24 +194,24 @@ struct Mat3 {
 		ret[7] = mat[1] * m[6] + mat[4] * m[7] + mat[7] * m[8];
 		ret[8] = mat[2] * m[6] + mat[5] * m[7] + mat[8] * m[8];
 		return ret;
-	}
+	}*/
 	__device__ Mat3 operator+(const Mat3 &m) const {
 		Mat3 ret;
-		ret[0] = mat[0] + m[0]; ret[3] = mat[3] + m[3]; ret[6] = mat[6] + m[6];
-		ret[1] = mat[1] + m[1]; ret[4] = mat[4] + m[4]; ret[7] = mat[7] + m[7];
-		ret[2] = mat[2] + m[2]; ret[5] = mat[5] + m[5]; ret[8] = mat[8] + m[8];
+		ret[0] = mat[0] + m[0]; ret[1] = mat[1] + m[1]; ret[2] = mat[2] + m[2];
+		ret[3] = mat[3] + m[3]; ret[4] = mat[4] + m[4]; ret[5] = mat[5] + m[5];
+		ret[6] = mat[6] + m[6]; ret[7] = mat[7] + m[7]; ret[8] = mat[8] + m[8];
 		return ret;
 	}
 	__device__ Mat3 operator-(const Mat3 &m) const {
 		Mat3 ret;
-		ret[0] = mat[0] - m[0]; ret[3] = mat[3] - m[3]; ret[6] = mat[6] - m[6];
-		ret[1] = mat[1] - m[1]; ret[4] = mat[4] - m[4]; ret[7] = mat[7] - m[7];
-		ret[2] = mat[2] - m[2]; ret[5] = mat[5] - m[5]; ret[8] = mat[8] - m[8];
+		ret[0] = mat[0] - m[0]; ret[1] = mat[1] - m[1]; ret[2] = mat[2] - m[2];
+		ret[3] = mat[3] - m[3]; ret[4] = mat[4] - m[4]; ret[5] = mat[5] - m[5];
+		ret[6] = mat[6] - m[6]; ret[7] = mat[7] - m[7]; ret[8] = mat[8] - m[8];
 		return ret;
 	}
 
 	__device__ Mat3 &operator*=(double f) { return *this = *this * f; }
-	__device__ Mat3 &operator*=(const Mat3 &m) { return *this = *this * m; }
+//	__device__ Mat3 &operator*=(const Mat3 &m) { return *this = *this * m; }
 	__device__ Mat3 &operator+=(const Mat3 &m) { return *this = *this + m; }
 	__device__ Mat3 &operator-=(const Mat3 &m) { return *this = *this - m; }
 
@@ -222,9 +223,9 @@ struct Mat3 {
 
 	__device__ Mat3 transpose() const {
 		Mat3 ret;
-		ret[0] = mat[0]; ret[3] = mat[1]; ret[6] = mat[2];
-		ret[1] = mat[3]; ret[4] = mat[4]; ret[7] = mat[5];
-		ret[2] = mat[6]; ret[5] = mat[7]; ret[8] = mat[8];
+		ret[0] = mat[0]; ret[1] = mat[3]; ret[2] = mat[6];
+		ret[3] = mat[1]; ret[4] = mat[4]; ret[5] = mat[7];
+		ret[6] = mat[2]; ret[7] = mat[5]; ret[8] = mat[8];
 		return ret;
 	}
 	__device__ double det() const {
@@ -253,14 +254,14 @@ struct Mat3 {
 	}
 
 	__device__ void zero() {
-		mat[0] = 0.0; mat[3] = 0.0; mat[6] = 0.0;
-		mat[1] = 0.0; mat[4] = 0.0; mat[7] = 0.0;
-		mat[2] = 0.0; mat[5] = 0.0; mat[8] = 0.0;
+		mat[0] = 0.0; mat[1] = 0.0; mat[2] = 0.0;
+		mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0;
+		mat[6] = 0.0; mat[7] = 0.0; mat[8] = 0.0;
 	}
 	__device__ void identity() {
-		mat[0] = 1.0; mat[3] = 0.0; mat[6] = 0.0;
-		mat[1] = 0.0; mat[4] = 1.0; mat[7] = 0.0;
-		mat[2] = 0.0; mat[5] = 0.0; mat[8] = 1.0;
+		mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
+		mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
+		mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 	}
 	/*
 	__device__ void rotate(const Vec3 &axis, double angle) {
@@ -289,35 +290,35 @@ struct Mat3 {
 		double rad = angle * DEG2RAD;
 		double c = cos(rad);
 		double s = sin(rad);
-		mat[0] = 1.0; mat[3] = 0.0; mat[6] = 0.0;
-		mat[1] = 0.0; mat[4] = c; mat[7] = -s;
-		mat[2] = 0.0; mat[5] = s; mat[8] = c;
+		mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
+		mat[3] = 0.0; mat[4] = c; mat[5] = s;
+		mat[6] = 0.0; mat[7] = -s; mat[8] = c;
 	}
 	__device__ void rotate_y(double angle) {
 		double rad = angle * DEG2RAD;
 		double c = cos(rad);
 		double s = sin(rad);
-		mat[0] = c; mat[3] = 0.0; mat[6] = s;
-		mat[1] = 0.0; mat[4] = 1.0; mat[7] = 0.0;
-		mat[2] = -s; mat[5] = 0.0; mat[8] = c;
+		mat[0] = c; mat[1] = 0.0; mat[2] = -s;
+		mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
+		mat[6] = s; mat[7] = 0.0; mat[8] = c;
 	}
 	__device__ void rotate_z(double angle) {
 		double rad = angle * DEG2RAD;
 		double c = cos(rad);
 		double s = sin(rad);
-		mat[0] = c; mat[3] = -s; mat[6] = 0.0;
-		mat[1] = s; mat[4] = c; mat[7] = 0.0;
-		mat[2] = 0.0; mat[5] = 0.0; mat[8] = 1.0;
+		mat[0] = c; mat[1] = s; mat[2] = 0.0;
+		mat[3] = -s; mat[4] = c; mat[5] = 0.0;
+		mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 	}
 	__device__ void scale(const Vec3 &v) {
-		mat[0] = v.x; mat[3] = 0.0; mat[6] = 0.0;
-		mat[1] = 0.0; mat[4] = v.y; mat[7] = 0.0;
-		mat[2] = 0.0; mat[5] = 0.0; mat[8] = v.z;
+		mat[0] = v.x; mat[1] = 0.0; mat[2] = 0.0;
+		mat[3] = 0.0; mat[4] = v.y; mat[5] = 0.0;
+		mat[6] = 0.0; mat[7] = 0.0; mat[8] = v.z;
 	}
 	__device__ void scale(double x, double y, double z) {
 		scale(Vec3(x, y, z));
 	}
-	/*
+
 	__device__ void orthonormalize() {
 		Vec3 x(mat[0], mat[1], mat[2]);
 		Vec3 y(mat[3], mat[4], mat[5]);
@@ -327,10 +328,10 @@ struct Mat3 {
 		z.normalize();
 		y.cross(z, x);
 		y.normalize();
-		mat[0] = x.x; mat[3] = y.x; mat[6] = z.x;
-		mat[1] = x.y; mat[4] = y.y; mat[7] = z.y;
-		mat[2] = x.z; mat[5] = y.z; mat[8] = z.z;
-	}*/
+		mat[0] = x.x; mat[1] = x.y; mat[2] = x.z;
+		mat[3] = y.x; mat[4] = y.y; mat[5] = y.z;
+		mat[6] = z.x; mat[7] = z.y; mat[8] = z.z;
+	}
 
 	union {
 		struct {
@@ -344,8 +345,8 @@ struct Mat3 {
 
 __device__ Vec3 Vec3::operator*(const Mat3 &mat) const {
 	Vec3 ret;
-	ret[0] = mat[0] * v[0] + mat[1] * v[1] + mat[2] * v[2];
-	ret[1] = mat[3] * v[0] + mat[4] * v[1] + mat[5] * v[2];
-	ret[2] = mat[6] * v[0] + mat[7] * v[1] + mat[8] * v[2];
+	ret[0] = mat[0] * v[0] + mat[3] * v[1] + mat[6] * v[2];
+	ret[1] = mat[1] * v[0] + mat[4] * v[1] + mat[7] * v[2];
+	ret[2] = mat[2] * v[0] + mat[5] * v[1] + mat[8] * v[2];
 	return ret;
 }

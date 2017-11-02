@@ -65,10 +65,13 @@ void MainWindow::mouseMoveEvent(QMouseEvent * event)
 	if (event->button() == Qt::RightButton) {
 		sData.cameraRotateY = x - mouseDownPos.x;
 		sData.cameraRotateX = y - mouseDownPos.y;
+
+		mouseDownPos.x = x;
+		mouseDownPos.y = y;
 	}
 }
 
 void MainWindow::wheelEvent(QWheelEvent * event)
 {
-	sData.cameraZoom = event->delta();
+	sData.cameraZoom = -event->delta();
 }
