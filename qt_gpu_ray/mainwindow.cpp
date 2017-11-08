@@ -62,7 +62,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent * event)
 {
 	int x = event->pos().x();
 	int y = event->pos().y();
-	if (event->button() == Qt::RightButton) {
+	if (event->buttons() & Qt::RightButton) {
 		sData.cameraRotateY = x - mouseDownPos.x;
 		sData.cameraRotateX = y - mouseDownPos.y;
 

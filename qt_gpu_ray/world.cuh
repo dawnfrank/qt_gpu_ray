@@ -25,11 +25,13 @@ public:
 				tmin = t;
 			}
 		}
+		if (sr.hit_an_object)return sr;
+		t = 0.5*(ray.direction.y / vp.vres + 1.0);
+		sr.color = (1.0 - t)*RGBColor(1.0, 1.0, 1.0) + t*RGBColor(0.5, 0.7, 1.0);
 		return sr;
 	}
 
 	Sphere* sp_ptr;
-	RGBColor bg_color;
 	ViewPlane vp;
 	Camera* camera_ptr;
 	Vector<ObjectBase*> objects;
